@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "30216471887",
+    "firebase_url": "https://witogov-default-rtdb.firebaseio.com",
+    "project_id": "witogov",
+    "storage_bucket": "witogov.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:30216471887:android:b16f2f4096c11dd8e0b13a",
+        "android_client_info": {
+          "package_name": "com.example.wito_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVWEDBVU8kt-M4mUNuayxR-_ItWMgJiBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:30216471887:android:d42890602c7f725fe0b13a",
+        "android_client_info": {
+          "package_name": "wito.government.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVWEDBVU8kt-M4mUNuayxR-_ItWMgJiBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

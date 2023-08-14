@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyD0UhlVXSgBHZx0re-C0SUWcxfEgvvosvQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>30216471887</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.witoApp</string>
+	<key>PROJECT_ID</key>
+	<string>witogov</string>
+	<key>STORAGE_BUCKET</key>
+	<string>witogov.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:30216471887:ios:e451ef8077763d4de0b13a</string>
+	<key>DATABASE_URL</key>
+	<string>https://witogov-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
