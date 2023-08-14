@@ -52,6 +52,32 @@ class _SignInState extends State<SignIn> {
   }
   final _formKey = GlobalKey<FormState>();
 
+  void _customSignIn() async {
+    final customLogin = _nidaNumberController.text;
+    final password = _passwordController.text;
+
+    // Send the custom login format to your server
+    final response = await http.post(
+      Uri.parse('https://witogov-default-rtdb.firebaseio.com/users'), // Update with your server URL
+      body: json.encode({
+        'custom_login': customLogin,
+        'password': password,
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      final token = responseData['token']; // Update this key based on your server response
+
+
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+    } else {
+      // Handle error
+    }
+  }
+
   @override
   void dispose() {
     _nidaNumberController.dispose();
@@ -59,7 +85,7 @@ class _SignInState extends State<SignIn> {
     super.dispose();
   }
 
-  Future<void> login() async {
+  /*Future<void> login() async {
     if (_formKey.currentState!.validate()) {
       final accountNumber = _nidaNumberController.text.toString();
       final password = _passwordController.text.toString();
@@ -150,7 +176,7 @@ class _SignInState extends State<SignIn> {
         );
       }
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +265,7 @@ class _SignInState extends State<SignIn> {
 
                             ElevatedButton(
 
-                              onPressed: login,
+                              onPressed: _customSignIn,
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Color.fromRGBO(0,157,230,0),
                                   onPrimary: Colors.white,
