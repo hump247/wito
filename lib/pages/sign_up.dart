@@ -32,7 +32,7 @@ class _RegistrationState extends State<Registration> {
   final _formKey = GlobalKey<FormState>();
   bool _acceptTerms = false;
   String generateAccountNumber() {
-    final int randomNumber = int.parse(DateTime.now().millisecondsSinceEpoch.toString().substring(6));
+    final int randomNumber = int.parse(DateTime.now().millisecondsSinceEpoch.toString().substring(1));
     final String formattedNumber = randomNumber.toString().padLeft(12, '1');
     return '${formattedNumber.substring(0, 4)}-${formattedNumber.substring(4, 8)}-${formattedNumber.substring(8, 12)}';
   }
