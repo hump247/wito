@@ -34,7 +34,7 @@ class _RegistrationState extends State<Registration> {
   String generateAccountNumber() {
     final int randomNumber = int.parse(DateTime.now().millisecondsSinceEpoch.toString().substring(6));
     final String formattedNumber = randomNumber.toString().padLeft(12, '1');
-    return '${formattedNumber.substring(1, 4)}-${formattedNumber.substring(4, 8)}-${formattedNumber.substring(8, 12)}';
+    return '${formattedNumber.substring(0, 4)}-${formattedNumber.substring(4, 8)}-${formattedNumber.substring(8, 12)}';
   }
 
   Future<void> _registerUser() async {
