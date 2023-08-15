@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:firebase_database/firebase_database.dart';
 import 'sing_in.dart';
 
 class Registration extends StatefulWidget {
@@ -15,6 +15,9 @@ class Registration extends StatefulWidget {
 class _RegistrationState extends State<Registration> {
   String _selectedItem = 'Arusha';
   String? selectedGender;
+  bool _registrationSuccess = false;
+
+
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
@@ -25,51 +28,109 @@ class _RegistrationState extends State<Registration> {
   final TextEditingController _confirmPasswordController =
   TextEditingController();
 
+
   final _formKey = GlobalKey<FormState>();
   bool _acceptTerms = false;
+  String generateAccountNumber() {
+    final int randomNumber = int.parse(DateTime.now().millisecondsSinceEpoch.toString().substring(6));
+    final String formattedNumber = randomNumber.toString().padLeft(12, '1');
+    return '${formattedNumber.substring(1, 4)}-${formattedNumber.substring(4, 8)}-${formattedNumber.substring(8, 12)}';
+  }
 
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate() || !_acceptTerms) {
       return;
     }
-
     final String firstName = _firstNameController.text;
     final String lastName = _lastNameController.text;
     final String phoneNumber = _phoneNumberController.text;
     final String email = _emailController.text;
     final String password = _passwordController.text;
-    final String confirmPassword = _confirmPasswordController.text;
-    final String gender = _genderController.text;
-    final String region = _regionController.text;
+    final String? gender = selectedGender;
+    final String region = _selectedItem;
+    final String accountNumber = generateAccountNumber();
 
-    final url = Uri.parse('http://3.109.82.192/api/auth/register/');
-    final headers = {'Content-Type': 'application/json'};
-    final body = json.encode({
-      'first_name': firstName,
-      'last_name': lastName,
-      'phone_number': phoneNumber,
-      'email': email,
-      'password': password,
-      'password2': confirmPassword,
-      'gender': gender,
-      'region': region,
+
+  final firebaseDatabase = FirebaseDatabase.instance.reference();
+
+  // Save user data to the Realtime Database
+  await firebaseDatabase.child('users').child(accountNumber).set({
+  'accNumber': accountNumber,
+  'first_name': firstName,
+  'last_name': lastName,
+  'phone_number': phoneNumber,
+  'email': email,
+  'gender': gender,
+  'region': region,
+    'password':password,
+    'salioKuu': 0
+  });
+
+    setState(() {
+      _registrationSuccess = true;
     });
 
-    try {
-      final response = await http.post(url, headers: headers, body: body);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Congratulations!'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Registration Successful'),
+              const SizedBox(height: 16),
+              Column(
+                children: [
+                  Text('Hello, $firstName!'),
+                  const SizedBox(height: 8),
+                  const Icon(Icons.check_circle, color: Colors.green),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text('successfully registered.'),
+              const SizedBox(height: 8),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Account Number: $accountNumber'),
+                  IconButton(
+                    icon: const Icon(Icons.copy),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: accountNumber));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Account number copied to clipboard')),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const SignIn()));
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
 
-      if (response.statusCode == 200) {
-        // Registration successful
-        // Perform necessary actions (e.g., save token, navigate to home screen)
-        print('Registration successful');
-      } else {
-        // Registration failed
-        // Display error message to the user
-        print('Registration failed: ${response.body}');
-      }
+
+
+
+    try {
+
+
     } catch (error) {
-      // Error occurred during the request
-      // Display error message to the user
+
       print('An error occurred: $error');
     }
   }
@@ -213,7 +274,7 @@ class _RegistrationState extends State<Registration> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter vaili email';
+                          return 'Please enter valid  email';
                         }
                         return null;
                       },
@@ -278,7 +339,7 @@ class _RegistrationState extends State<Registration> {
                       ),
                       SizedBox(width: 45),
                       Radio(
-                        value: 'male',
+                        value: 'Me',
                         groupValue: selectedGender,
                         onChanged: (value) {
                           setState(() {
@@ -288,8 +349,7 @@ class _RegistrationState extends State<Registration> {
                       ),
                       Text('Me',style: TextStyle(color: Colors.white),),
                       Radio(
-
-                        value: 'female',
+                        value: 'Ke',
                         groupValue: selectedGender,
                         onChanged: (value) {
                           setState(() {
@@ -407,7 +467,7 @@ class _RegistrationState extends State<Registration> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        registerUser();
+                        _registerUser();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff0070ac),
