@@ -5,6 +5,9 @@ import 'package:wito_app/pages/sign_up.dart';
 import 'package:wito_app/pages/verify.dart';
 import 'package:wito_app/screens/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../home_page_bottom.dart';
 
@@ -17,18 +20,36 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  final TextEditingController _nidaNumberController = TextEditingController();
+  final databaseReference = FirebaseDatabase.instance.reference();
+  final TextEditingController _numberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+    void _checkCredentials() {
+      String username = _numberController.text;
+      String password = _passwordController.text;
+
+      databaseReference.child('users').child(username).once().then((DatabaseEvent event) {
+        DataSnapshot snapshot = event.snapshot;
+        dynamic value = snapshot.value; // Cast to dynamic
+        if (value != null && value is Map && value['password'] == password) {
+          // Navigate to the next page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        } else {showToast("Enter correct credentials");
+        }
+      });
+    }
 
 
   @override
   void initState() {
     super.initState();
-    _nidaNumberController.addListener(updateFormattedResult);
+    _numberController.addListener(updateFormattedResult);
   }
 
   void updateFormattedResult() {
-    String input = _nidaNumberController.text.replaceAll(RegExp(r'\D'), ''); // Remove non-digit characters
+    String input = _numberController.text.replaceAll(RegExp(r'\D'), ''); // Remove non-digit characters
     String formattedResult = '';
 
     if (input.isNotEmpty) {
@@ -44,52 +65,26 @@ class _SignInState extends State<SignIn> {
     }
 
     setState(() {
-      _nidaNumberController.value = _nidaNumberController.value.copyWith(
+      _numberController.value = _numberController.value.copyWith(
         text: formattedResult,
         selection: TextSelection.collapsed(offset: formattedResult.length),
       );
     });
   }
+
+
   final _formKey = GlobalKey<FormState>();
 
-  void _customSignIn() async {
-    final customLogin = _nidaNumberController.text;
-    final password = _passwordController.text;
-
-    // Send the custom login format to your server
-    final response = await http.post(
-      Uri.parse('https://witogov-default-rtdb.firebaseio.com/users'), // Update with your server URL
-      body: json.encode({
-        'custom_login': customLogin,
-        'password': password,
-      }),
-      headers: {'Content-Type': 'application/json'},
-    );
 
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final token = responseData['token']; // Update this key based on your server response
 
 
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
-    } else {
-      // Handle error
-    }
-  }
-
-  @override
-  void dispose() {
-    _nidaNumberController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
 
   /*Future<void> login() async {
     if (_formKey.currentState!.validate()) {
       final accountNumber = _nidaNumberController.text.toString();
       final password = _passwordController.text.toString();
-      
+
       // Authenticating User...
      // FirebaseAuth.instance.createUserWithEmailAndPassword(email: accountNumber, password: password)
 
@@ -177,6 +172,12 @@ class _SignInState extends State<SignIn> {
       }
     }
   }*/
+  void showToast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+    ));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +211,7 @@ class _SignInState extends State<SignIn> {
                         SizedBox(
                           height: 50,
                           child: TextFormField(
-                            controller: _nidaNumberController,
+                            controller: _numberController,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               fillColor: const Color(0xffeaf2f2),
@@ -261,20 +262,11 @@ class _SignInState extends State<SignIn> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-
-
                             ElevatedButton(
-
-                              onPressed: _customSignIn,
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color.fromRGBO(0,157,230,0),
-                                  onPrimary: Colors.white,
-                                  minimumSize: Size(148, 45)
-                              ),
-                              child: const Text(
-                                'Ingia',
-                                style: TextStyle(fontSize: 16, color: Colors.white),
-                              ),
+                              onPressed: () async {
+                                _checkCredentials();
+                              },
+                              child: Text('LOG IN'),
                             ),
 
                             const SizedBox(width: 10),
